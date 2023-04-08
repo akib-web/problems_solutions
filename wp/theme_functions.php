@@ -74,3 +74,51 @@ function bitBirds_default_catalog_orderby( $orderby ) {
 
 add_filter( 'woocommerce_default_catalog_orderby', 'bitBirds_default_catalog_orderby', 20, 1 );
 
+
+function update_merchshark_highest_profit_margin( $post_id ) {
+    // Check if the post is a product
+    if ( get_post_type( $post_id ) != 'product' ) {
+        return;
+    }
+
+    // Get the regular price, sale price, and cost of goods
+    $regular_price = get_post_meta( $post_id, '_regular_price', true );
+    $sale_price = get_post_meta( $post_id, '_sale_price', true );
+    $cost_of_goods = get_post_meta( $post_id, 'yith_cog_cost', true );
+
+    // Calculate the highest profit margin
+    $profit_margin = 0;
+    if ( ! empty( $regular_price ) && ! empty( $cost_of_goods ) ) {
+        $profit_margin = ( $regular_price - $cost_of_goods ) / $regular_price * 100;
+    }
+    if ( ! empty( $sale_price ) && ! empty( $cost_of_goods ) ) {
+        $sale_margin = ( $sale_price - $cost_of_goods ) / $sale_price * 100;
+        $profit_margin = max( $profit_margin, $sale_margin );
+    }
+
+    // Update the _merchshark_highest_profit_margin meta value
+    update_post_meta( $post_id, '_merchshark_highest_profit_margin', $profit_margin );
+}
+
+add_action( 'save_post_product', 'update_merchshark_highest_profit_margin', 10, 1 );
+
+function update_all_merchshark_highest_profit_margin() {
+    // Get all the products
+    $args = array(
+        'post_type' => 'product',
+        'posts_per_page' => -1,
+    );
+    $products = new WP_Query( $args );
+
+    // Loop through each product and update the _merchshark_highest_profit_margin meta value
+    if ( $products->have_posts() ) {
+        while ( $products->have_posts() ) {
+            $products->the_post();
+            update_merchshark_highest_profit_margin( get_the_ID() );
+        }
+        wp_reset_postdata();
+    }
+}
+
+// Run the update script on init (you can remove this after running the script)
+// add_action( 'init', 'update_all_merchshark_highest_profit_margin' );
