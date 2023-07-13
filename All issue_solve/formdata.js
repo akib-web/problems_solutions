@@ -1,4 +1,4 @@
-function modify_payment_methods_Form(){
+function modify_payment_methods_Form(event){
     event.preventDefault();
     var form_id = 'modify_payment_methods_Form';
     var route = "{{ route('admin.app_control.edit_payment_methods') }}";
