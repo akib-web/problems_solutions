@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown</title>
+</head>
+<body>
+  <div id="countdown"></div>
+  <div id="current_time"></div>
+  <div id="test"></div>
+  <script src="https://moment.github.io/luxon/global/luxon.min.js"></script>
+  <script>
+    const targetTime = "15:00:00";
+    const targetTimeZone = "Europe/Copenhagen";
+
+    function updateCountdown() {
+// 	  const now = luxon.DateTime.now();
+	  	const copenhagenTimeZone = "Europe/Copenhagen";
+		const formatter = new Intl.DateTimeFormat("en", {
+		  hour: "2-digit",
+		  minute: "2-digit",
+		  second: "2-digit",
+		  hour12: false,
+		  timeZone: copenhagenTimeZone,
+		});
+
+		const copenhagenTime = formatter.format(new Date());
+        
+	  const now = luxon.DateTime.fromFormat(copenhagenTime, "HH:mm:ss", { zone: copenhagenTimeZone });
+	  const target = luxon.DateTime.fromFormat(targetTime, "HH:mm:ss", { zone: targetTimeZone });
+
+	  if (now >= target) {
+		document.getElementById("countdown").textContent = "Countdown expired";
+		return;
+	  }
+
+	  const duration = target.diff(now);
+
+	  const hours = Math.floor(duration.as("hours"));
+	  const minutes = Math.floor(duration.as("minutes")) % 60;
+	  const seconds = Math.floor(duration.as("seconds")) % 60;
+
+
+	document.getElementById("test").textContent = target;
+
+	  const countdownText = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+	  document.getElementById("countdown").textContent = countdownText;
+      
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+	  
+	  
+	  
+	  
+	const copenhagenTimeZone = "Europe/Copenhagen";
+	const formatter = new Intl.DateTimeFormat("en", {
+	  hour: "2-digit",
+	  minute: "2-digit",
+	  second: "2-digit",
+	  hour12: false,
+	  timeZone: copenhagenTimeZone,
+	});
+
+	const copenhagenTime = formatter.format(new Date());
+	console.log("Current Copenhagen Time: " + copenhagenTime);
+	   document.getElementById("current_time").textContent = copenhagenTime;
+  </script>
+</body>
+</html>
